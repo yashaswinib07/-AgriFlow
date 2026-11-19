@@ -3,9 +3,7 @@
  */
 
 // Auto-detect API base URL: If running on port 8000, use relative paths; otherwise connect to localhost:8000
-const API_BASE = (window.location.port === "8000" || window.location.pathname.startsWith("/api"))
-  ? ""
-  : "http://127.0.0.1:8000";
+const API_BASE = "";
 
 // ----------------- Auth & Session Helpers -----------------
 const Auth = {
