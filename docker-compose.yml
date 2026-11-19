@@ -1,0 +1,13 @@
+services:
+  agriflow:
+    build: .
+    container_name: agriflow-web
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - AGRIFLOW_SECRET_KEY=agriflow_production_secret_key_2026
+    volumes:
+      - ./backend:/app/backend
+      - ./uploads:/app/uploads
+

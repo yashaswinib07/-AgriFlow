@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buyer Dashboard – AgriFlow</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="brand-logo">
+        <svg viewBox="0 0 24 24">
+          <path d="M17,8C8,10 5.9,16.17 3.82,21.34L5.71,22L6.66,19.7C7.14,19.87 7.64,20 8,20C19,20 22,3 22,3C21,5 14,5.25 9,6.25C4,7.25 2,11.5 2,13.5C2,15.5 3.75,17.25 3.75,17.25C7,8 17,8 17,8Z"/>
+        </svg>
+        <span>AgriFlow</span>
+        <span class="brand-badge">Buyer Dashboard</span>
+      </a>
+
+      <div class="nav-auth-buttons">
+        <a href="marketplace.html" class="btn btn-outline btn-sm">Full Marketplace</a>
+        <button onclick="Auth.logout()" class="btn btn-danger btn-sm">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Header with Buyer info -->
+    <div class="dashboard-header">
+      <div class="dashboard-user-bar">
+        <div>
+          <h1 class="user-welcome-title">Welcome, <span id="buyer-name">Buyer</span>! 🏪</h1>
+          <p class="user-subtext">
+            <span>🏢 <strong id="buyer-business">Direct Procurement</strong></span> &bull; 
+            <span>📍 Delivery Base: <strong id="buyer-location">Loading...</strong></span>
+          </p>
+        </div>
+        <div>
+          <button class="btn btn-secondary" onclick="openRequirementModal()">
+            + Post Custom Crop Requirement
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="tab-nav">
+      <button id="tab-browse-btn" class="tab-btn active" onclick="switchBuyerTab('browse')">
+        Browse & Purchase Crops
+      </button>
+      <button id="tab-orders-btn" class="tab-btn" onclick="switchBuyerTab('orders')">
+        My Orders & Live Tracking
+      </button>
+      <button id="tab-reqs-btn" class="tab-btn" onclick="switchBuyerTab('reqs')">
+        My Requirement Requests & Farmer Quotes
+      </button>
+    </div>
+
+    <!-- TAB 1: Browse Crops -->
+    <div id="pane-browse" class="tab-pane active">
+      <!-- Search & Filter Controls -->
+      <div class="form-card" style="padding: 1.25rem; margin-bottom: 2rem;">
+        <div class="form-row" style="grid-template-columns: 2fr 1fr 1fr 1fr auto;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Search Crops or Location</label>
+            <input type="text" id="filter-search" class="form-control" placeholder="Search tomatoes, rice, wheat, Nashik..." oninput="debounceFilter()">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Category</label>
+            <select id="filter-category" class="form-control" onchange="applyCropFilters()">
+              <option value="all">All Categories</option>
+              <option value="Grains">Grains</option>
+              <option value="Vegetables">Vegetables</option>
+              <option value="Fruits">Fruits</option>
+              <option value="Pulses">Pulses</option>
+              <option value="Oilseeds">Oilseeds</option>
+              <option value="Spices">Spices</option>
+              <option value="Other agricultural products">Other Products</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Crop Type</label>
+            <select id="filter-type" class="form-control" onchange="applyCropFilters()">
+              <option value="all">All Harvests</option>
+              <option value="fresh">Fresh Harvest Only</option>
+              <option value="surplus">Surplus Deals (Discounted)</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Max Price (₹/kg)</label>
+            <input type="number" id="filter-max-price" class="form-control" placeholder="Max ₹" oninput="debounceFilter()">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0; display: flex; align-items: flex-end;">
+            <button class="btn btn-outline" style="width: 100%;" onclick="resetCropFilters()">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Crops Grid -->
+      <div id="buyer-crops-grid" class="grid-cards">
+        <div style="text-align: center; grid-column: 1 / -1; padding: 3rem; color: var(--text-muted);">
+          Loading available crops...
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: Orders & Live Tracking -->
+    <div id="pane-orders" class="tab-pane">
+      <div style="margin-bottom: 1rem;">
+        <h3 style="color: var(--primary-dark); font-weight: 700;">My Order History & Live Dispatch Tracking</h3>
+        <p style="font-size: 0.88rem; color: var(--text-muted);">
+          Track order acceptance, dispatch vehicle details, and final delivery confirmations.
+        </p>
+      </div>
+
+      <div id="buyer-orders-container">
+        <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+          Loading your order history...
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: My Requirements & Farmer Responses -->
+    <div id="pane-reqs" class="tab-pane">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <div>
+          <h3 style="color: var(--primary-dark); font-weight: 700;">Custom Crop Requirements & Farmer Quotations</h3>
+          <p style="font-size: 0.88rem; color: var(--text-muted);">
+            Requirements posted by you. Farmers submit direct availability quotes here.
+          </p>
+        </div>
+        <button class="btn btn-secondary" onclick="openRequirementModal()">
+          + Post New Requirement
+        </button>
+      </div>
+
+      <div id="buyer-reqs-container">
+        <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+          Loading requirements...
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ORDER MODAL WITH BUILT-IN TRANSPORTATION CALCULATION -->
+  <div id="order-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Place Crop Order</h3>
+        <button class="modal-close" onclick="closeModal('order-modal')">&times;</button>
+      </div>
+
+      <form id="order-form" onsubmit="handleConfirmOrder(event)">
+        <div class="modal-body">
+          <input type="hidden" id="order-crop-id">
+          <input type="hidden" id="order-unit-price">
+          <input type="hidden" id="order-max-stock">
+
+          <!-- Crop Header in Modal -->
+          <div id="order-crop-summary" style="display: flex; gap: 1rem; align-items: center; background: var(--primary-subtle); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-green); margin-bottom: 1.25rem;">
+            <!-- Filled dynamically -->
+          </div>
+
+          <!-- Quantity to purchase -->
+          <div class="form-group">
+            <label class="form-label" for="order-quantity">
+              Order Quantity in kilograms (kg) *
+            </label>
+            <input type="number" id="order-quantity" class="form-control" min="1" step="0.5" required oninput="recalcOrderBreakdown()">
+            <div id="order-stock-notice" class="form-helper" style="color: var(--primary-dark); font-weight: 600;">
+              Available stock: Loading...
+            </div>
+          </div>
+
+          <!-- TRANSPORTATION SECTION (CRITICAL FEATURE) -->
+          <div style="background: #ffffff; border: 2px solid var(--border-green); border-radius: var(--radius-md); padding: 1.25rem; margin: 1.5rem 0;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+              <span style="font-size: 1.3rem;">🚚</span>
+              <h4 style="color: var(--primary-dark); font-size: 1.05rem;">Transportation Charges</h4>
+            </div>
+
+            <p style="font-size: 0.9rem; color: #4b5563; margin-bottom: 1rem;">
+              <strong>Do you require transportation?</strong>
+            </p>
+
+            <div style="display: flex; gap: 2rem; margin-bottom: 1rem;">
+              <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-weight: 600;">
+                <input type="radio" name="order_transport" value="yes" checked onchange="toggleTransportFields()">
+                <span>1. Yes, I need transportation</span>
+              </label>
+
+              <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-weight: 600;">
+                <input type="radio" name="order_transport" value="no" onchange="toggleTransportFields()">
+                <span>2. No, I will arrange transportation myself</span>
+              </label>
+            </div>
+
+            <!-- Fields when Yes is selected -->
+            <div id="transport-fields-container">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="order-vehicle">Select Vehicle Type *</label>
+                  <select id="order-vehicle" class="form-control" onchange="recalcOrderBreakdown()">
+                    <option value="Tractor">Tractor (Base: ₹200 + ₹15/km, up to 2,000 kg)</option>
+                    <option value="Mini Truck" selected>Mini Truck (Base: ₹350 + ₹25/km, up to 3,500 kg)</option>
+                    <option value="Truck">Truck (Base: ₹600 + ₹40/km, up to 10,000 kg)</option>
+                    <option value="Large Goods Vehicle">Large Goods Vehicle (Base: ₹1000 + ₹60/km, up to 25,000 kg)</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="order-distance">Estimated Distance (km) *</label>
+                  <input type="number" id="order-distance" class="form-control" value="20" min="1" step="1" oninput="recalcOrderBreakdown()">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="order-location">Delivery Destination Address *</label>
+              <input type="text" id="order-location" class="form-control" placeholder="e.g., APMC Yard, Yeshwanthpur, Bangalore" required>
+            </div>
+          </div>
+
+          <!-- PRICE BREAKDOWN DISPLAY -->
+          <div class="breakdown-box">
+            <h4 style="color: var(--primary-dark); margin-bottom: 0.5rem; font-size: 1rem;">Price Calculation Breakdown</h4>
+            <div class="breakdown-row">
+              <span id="breakdown-crop-calc">Crop quantity × Price per kg:</span>
+              <strong id="breakdown-crop-amount">₹0</strong>
+            </div>
+            <div class="breakdown-row">
+              <span id="breakdown-transport-label">Estimated Transportation:</span>
+              <strong id="breakdown-transport-amount">₹0</strong>
+            </div>
+            <div class="breakdown-row total-row">
+              <span>Final Total Amount:</span>
+              <span id="breakdown-final-total">₹0</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="order-notes">Special Instructions (Optional)</label>
+            <input type="text" id="order-notes" class="form-control" placeholder="e.g., Deliver before 10 AM, unload at Gate 2">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('order-modal')">Cancel</button>
+          <button type="submit" id="btn-confirm-order" class="btn btn-primary btn-lg">
+            Confirm & Place Order →
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- BUYER REQUIREMENT REQUEST MODAL -->
+  <div id="requirement-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">Post Crop Requirement Request</h3>
+        <button class="modal-close" onclick="closeModal('requirement-modal')">&times;</button>
+      </div>
+
+      <form id="requirement-form" onsubmit="handlePostRequirement(event)">
+        <div class="modal-body">
+          <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+            Looking for a crop not currently in the marketplace? Post your demand here and farmers across the region will be notified to send you supply offers.
+          </p>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="req-crop-name">Crop Name Required *</label>
+              <input type="text" id="req-crop-name" class="form-control" placeholder="e.g., Organic Baby Carrots / Basmati Rice" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="req-category">Crop Category *</label>
+              <select id="req-category" class="form-control" required>
+                <option value="">Select Category</option>
+                <option value="Grains">Grains (Rice, Wheat, Maize, Ragi)</option>
+                <option value="Vegetables">Vegetables (Tomato, Potato, Carrot, etc.)</option>
+                <option value="Fruits">Fruits (Mango, Banana, Apple, etc.)</option>
+                <option value="Pulses">Pulses (Chickpeas, Gram, Lentils)</option>
+                <option value="Oilseeds">Oilseeds (Groundnut, Sunflower, Mustard)</option>
+                <option value="Spices">Spices (Chilli, Turmeric, Pepper)</option>
+                <option value="Other agricultural products">Other agricultural products</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="req-quantity">Required Quantity in kg *</label>
+              <input type="number" id="req-quantity" class="form-control" placeholder="e.g., 1000" min="1" step="0.5" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="req-expected-price">Expected Price per kg (₹) *</label>
+              <input type="number" id="req-expected-price" class="form-control" placeholder="e.g., 35" min="1" step="0.5" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="req-date">Required Date *</label>
+              <input type="date" id="req-date" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="req-transport">Transportation Required *</label>
+              <select id="req-transport" class="form-control" required>
+                <option value="yes">Yes, I need transportation</option>
+                <option value="no">No, I will arrange pickup</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="req-location">Required Delivery Location *</label>
+            <input type="text" id="req-location" class="form-control" placeholder="e.g., Bangalore Wholesale Hub" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="req-desc">Additional Description / Quality Specs</label>
+            <textarea id="req-desc" class="form-control" rows="3" placeholder="Provide details on variety, packaging, moisture standards, or delivery timelines..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('requirement-modal')">Cancel</button>
+          <button type="submit" id="btn-submit-req" class="btn btn-secondary">
+            Publish Requirement →
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    // Enforce Buyer Authentication
+    if (!Auth.isLoggedIn() || !Auth.isBuyer()) {
+      showToast("Please log in as a buyer to access this dashboard", "error");
+      setTimeout(() => { window.location.href = "buyer-login.html"; }, 500);
+    }
+
+    let allCrops = [];
+    let filterDebounceTimer = null;
+
+    // Tab switcher
+    function switchBuyerTab(tab) {
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
+
+      document.getElementById(`tab-${tab}-btn`).classList.add("active");
+      document.getElementById(`pane-${tab}`).classList.add("active");
+
+      if (tab === "browse") loadMarketplaceCrops();
+      if (tab === "orders") loadBuyerOrders();
+      if (tab === "reqs") loadBuyerRequirements();
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const user = Auth.getUser();
+      if (user) {
+        document.getElementById("buyer-name").textContent = user.full_name;
+        document.getElementById("buyer-location").textContent = user.location;
+        document.getElementById("buyer-business").textContent = user.business_name || "Direct Wholesale Buyer";
+        document.getElementById("order-location").value = user.location;
+        document.getElementById("req-location").value = user.location;
+      }
+      // Set default requirement date 7 days from now
+      const d = new Date();
+      d.setDate(d.getDate() + 7);
+      document.getElementById("req-date").value = d.toISOString().split("T")[0];
+
+      loadMarketplaceCrops();
+    });
+
+    // 1. Browse marketplace crops
+    async function loadMarketplaceCrops() {
+      const container = document.getElementById("buyer-crops-grid");
+      try {
+        allCrops = await apiRequest("/api/crops/");
+        renderCrops(allCrops);
+      } catch (err) {
+        container.innerHTML = `<div style="color: var(--danger); text-align: center; grid-column: 1 / -1; padding: 2rem;">Error loading crops: ${err.message}</div>`;
+      }
+    }
+
+    function renderCrops(crops) {
+      const container = document.getElementById("buyer-crops-grid");
+      if (!crops || crops.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; grid-column: 1 / -1; padding: 3rem; background: #fff; border-radius: 8px; border: 1px dashed var(--border-light); color: var(--text-muted);">
+            No crops matched your filters. Try clearing search or category filters.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = crops.map(c => {
+        const isSurplus = c.crop_type === "surplus" || c.crop_type === "discounted";
+        const discountPct = isSurplus ? Math.round(((c.price_per_kg - c.effective_price) / c.price_per_kg) * 100) : 0;
+
+        return `
+          <div class="crop-card">
+            <div class="crop-card-img-wrap">
+              <img src="${c.image_url || 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=600'}" alt="${c.name}" loading="lazy">
+              <div class="crop-card-badge">
+                <span class="badge ${isSurplus ? 'badge-surplus' : 'badge-fresh'}">
+                  ${isSurplus ? `Surplus -${discountPct}%` : 'Fresh Crop'}
+                </span>
+              </div>
+              <div class="crop-card-cat">${c.category}</div>
+            </div>
+
+            <div class="crop-card-body">
+              <h3 class="crop-card-title">${c.name}</h3>
+              <div class="crop-card-farmer">
+                <span>🧑‍🌾 ${c.farmer_name}</span> &bull; <span>📍 ${c.location}</span>
+              </div>
+
+              <div class="crop-card-info-row">
+                <span>Available Stock:</span>
+                <strong>${formatKg(c.quantity_kg)}</strong>
+              </div>
+              <div class="crop-card-info-row">
+                <span>Quality Grade:</span>
+                <span>${c.quality}</span>
+              </div>
+              <div class="crop-card-info-row">
+                <span>Harvest Date:</span>
+                <span>${c.harvest_date}</span>
+              </div>
+
+              <div class="crop-price-box">
+                <div>
+                  <span class="price-main">${formatCurrency(c.effective_price)}</span>
+                  <span style="font-size: 0.85rem; color: var(--text-muted);">/kg</span>
+                  ${isSurplus && c.discount_price_per_kg ? `<span class="price-original">${formatCurrency(c.price_per_kg)}</span>` : ''}
+                </div>
+                ${isSurplus ? `<span class="price-savings">Save ${discountPct}%</span>` : ''}
+              </div>
+
+              <button class="btn ${isSurplus ? 'btn-secondary' : 'btn-primary'} btn-block" onclick="openOrderModal(${c.id})">
+                Buy Now →
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function debounceFilter() {
+      clearTimeout(filterDebounceTimer);
+      filterDebounceTimer = setTimeout(applyCropFilters, 300);
+    }
+
+    function applyCropFilters() {
+      const search = document.getElementById("filter-search").value.trim().toLowerCase();
+      const category = document.getElementById("filter-category").value;
+      const type = document.getElementById("filter-type").value;
+      const maxPrice = parseFloat(document.getElementById("filter-max-price").value) || Infinity;
+
+      const filtered = allCrops.filter(c => {
+        const matchesSearch = !search || 
+          c.name.toLowerCase().includes(search) || 
+          c.location.toLowerCase().includes(search) ||
+          c.description?.toLowerCase().includes(search);
+
+        const matchesCat = category === "all" || c.category === category;
+        const matchesType = type === "all" || (type === "surplus" ? (c.crop_type === "surplus" || c.crop_type === "discounted") : c.crop_type === "fresh");
+        const matchesPrice = c.effective_price <= maxPrice;
+
+        return matchesSearch && matchesCat && matchesType && matchesPrice;
+      });
+
+      renderCrops(filtered);
+    }
+
+    function resetCropFilters() {
+      document.getElementById("filter-search").value = "";
+      document.getElementById("filter-category").value = "all";
+      document.getElementById("filter-type").value = "all";
+      document.getElementById("filter-max-price").value = "";
+      renderCrops(allCrops);
+    }
+
+    // 2. Buy Now & Transportation Order Modal
+    function openOrderModal(cropId) {
+      const crop = allCrops.find(c => c.id === cropId);
+      if (!crop) return;
+
+      document.getElementById("order-crop-id").value = crop.id;
+      document.getElementById("order-unit-price").value = crop.effective_price;
+      document.getElementById("order-max-stock").value = crop.quantity_kg;
+
+      document.getElementById("order-crop-summary").innerHTML = `
+        <img src="${crop.image_url || 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=100'}" style="width: 55px; height: 55px; border-radius: 6px; object-fit: cover;">
+        <div>
+          <h4 style="color: var(--primary-dark); font-size: 1.1rem;">${crop.name}</h4>
+          <div style="font-size: 0.85rem; color: var(--text-muted);">
+            Farmer: <strong>${crop.farmer_name}</strong> &bull; Location: <strong>${crop.location}</strong>
+          </div>
+          <div style="font-size: 0.95rem; font-weight: 700; color: var(--primary-dark); margin-top: 0.2rem;">
+            Unit Price: ${formatCurrency(crop.effective_price)} / kg
+          </div>
+        </div>
+      `;
+
+      // Set default quantity (e.g. 100 kg or max stock if less)
+      const defaultQty = Math.min(100, crop.quantity_kg);
+      document.getElementById("order-quantity").value = defaultQty;
+      document.getElementById("order-quantity").max = crop.quantity_kg;
+      document.getElementById("order-stock-notice").textContent = `Available stock: ${formatKg(crop.quantity_kg)}`;
+
+      // Reset transportation to Yes
+      document.querySelector('input[name="order_transport"][value="yes"]').checked = true;
+      toggleTransportFields();
+      recalcOrderBreakdown();
+
+      openModal("order-modal");
+    }
+
+    function toggleTransportFields() {
+      const isTransport = document.querySelector('input[name="order_transport"]:checked').value === "yes";
+      document.getElementById("transport-fields-container").style.display = isTransport ? "block" : "none";
+      recalcOrderBreakdown();
+    }
+
+    function recalcOrderBreakdown() {
+      const qty = parseFloat(document.getElementById("order-quantity").value) || 0;
+      const unitPrice = parseFloat(document.getElementById("order-unit-price").value) || 0;
+      const isTransport = document.querySelector('input[name="order_transport"]:checked').value === "yes";
+
+      const cropAmount = Math.round(qty * unitPrice * 100) / 100;
+      let transportCharge = 0;
+
+      if (isTransport) {
+        const vehicle = document.getElementById("order-vehicle").value;
+        const dist = parseFloat(document.getElementById("order-distance").value) || 0;
+
+        let base = 350;
+        let perKm = 25;
+        if (vehicle === "Tractor") { base = 200; perKm = 15; }
+        if (vehicle === "Mini Truck") { base = 350; perKm = 25; }
+        if (vehicle === "Truck") { base = 600; perKm = 40; }
+        if (vehicle === "Large Goods Vehicle") { base = 1000; perKm = 60; }
+
+        transportCharge = Math.round((base + (dist * perKm)) * 100) / 100;
+        document.getElementById("breakdown-transport-label").textContent = `Transportation (${vehicle}, ${dist} km):`;
+      } else {
+        document.getElementById("breakdown-transport-label").textContent = "Transportation (Self-pickup):";
+      }
+
+      const finalTotal = Math.round((cropAmount + transportCharge) * 100) / 100;
+
+      document.getElementById("breakdown-crop-calc").textContent = `Crop quantity (${qty} kg × ₹${unitPrice}/kg):`;
+      document.getElementById("breakdown-crop-amount").textContent = formatCurrency(cropAmount);
+      document.getElementById("breakdown-transport-amount").textContent = formatCurrency(transportCharge);
+      document.getElementById("breakdown-final-total").textContent = formatCurrency(finalTotal);
+    }
+
+    // Confirm & Submit Order
+    async function handleConfirmOrder(e) {
+      e.preventDefault();
+      const cropId = parseInt(document.getElementById("order-crop-id").value);
+      const quantity_kg = parseFloat(document.getElementById("order-quantity").value);
+      const maxStock = parseFloat(document.getElementById("order-max-stock").value);
+      const isTransport = document.querySelector('input[name="order_transport"]:checked').value === "yes";
+      const vehicle_type = isTransport ? document.getElementById("order-vehicle").value : null;
+      const distance_km = isTransport ? parseFloat(document.getElementById("order-distance").value) : 0;
+      const delivery_location = document.getElementById("order-location").value.trim();
+      const notes = document.getElementById("order-notes").value.trim() || null;
+
+      if (quantity_kg > maxStock) {
+        showToast(`Requested quantity exceeds available stock (${formatKg(maxStock)})`, "error");
+        return;
+      }
+
+      const btn = document.getElementById("btn-confirm-order");
+      btn.disabled = true;
+      btn.textContent = "Processing Order...";
+
+      try {
+        const order = await apiRequest("/api/orders/", {
+          method: "POST",
+          body: JSON.stringify({
+            crop_id: cropId,
+            quantity_kg,
+            requires_transport: isTransport,
+            vehicle_type,
+            delivery_location,
+            distance_km,
+            notes
+          })
+        });
+
+        showToast(`Order #${order.id} placed successfully!`, "success");
+        closeModal("order-modal");
+        loadMarketplaceCrops();
+        switchBuyerTab("orders");
+      } catch (err) {
+        showToast(err.message, "error");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Confirm & Place Order →";
+      }
+    }
+
+    // 3. Buyer Orders & Tracking
+    async function loadBuyerOrders() {
+      const container = document.getElementById("buyer-orders-container");
+      try {
+        const orders = await apiRequest("/api/buyers/orders");
+        if (!orders || orders.length === 0) {
+          container.innerHTML = `
+            <div style="text-align: center; padding: 3rem; background: #fff; border-radius: 8px; border: 1px dashed var(--border-light); color: var(--text-muted);">
+              You haven't placed any orders yet. Browse crops and place your first order!
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = `
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Order #</th>
+                  <th>Crop</th>
+                  <th>Farmer & Origin</th>
+                  <th>Quantity</th>
+                  <th>Price Breakdown</th>
+                  <th>Final Total</th>
+                  <th>Live Tracking Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${orders.map(order => `
+                  <tr>
+                    <td><strong>#${order.id}</strong></td>
+                    <td>
+                      <div style="display: flex; align-items: center; gap: 0.6rem;">
+                        <img src="${order.crop_image || 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=100'}" style="width: 40px; height: 40px; border-radius: 6px; object-fit: cover;">
+                        <div>
+                          <strong>${order.crop_name}</strong>
+                          <div style="font-size: 0.78rem; color: var(--text-muted);">${formatCurrency(order.price_per_kg)}/kg</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div><strong>${order.farmer_name}</strong></div>
+                      <div style="font-size: 0.8rem; color: var(--text-muted);">📞 ${order.farmer_phone}</div>
+                    </td>
+                    <td><strong>${formatKg(order.quantity_kg)}</strong></td>
+                    <td style="font-size: 0.85rem;">
+                      <div>Crop: ${formatCurrency(order.crop_amount)}</div>
+                      <div style="color: var(--text-muted);">
+                        Transport: ${order.requires_transport ? `${formatCurrency(order.transport_charge)} (${order.vehicle_type})` : 'Self-pickup (₹0)'}
+                      </div>
+                    </td>
+                    <td>
+                      <strong style="color: var(--primary-dark); font-size: 1.1rem;">
+                        ${formatCurrency(order.final_amount)}
+                      </strong>
+                    </td>
+                    <td>
+                      <span class="badge badge-status badge-${order.status}" style="font-size: 0.85rem; padding: 0.35rem 0.7rem;">
+                        ${order.status}
+                      </span>
+                    </td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+          </div>
+        `;
+      } catch (err) {
+        container.innerHTML = `<div style="color: var(--danger); text-align: center; padding: 2rem;">Error: ${err.message}</div>`;
+      }
+    }
+
+    // 4. Custom Crop Requirement Request (Post & View Quotes)
+    function openRequirementModal() {
+      document.getElementById("requirement-form").reset();
+      const user = Auth.getUser();
+      if (user) document.getElementById("req-location").value = user.location;
+      const d = new Date();
+      d.setDate(d.getDate() + 7);
+      document.getElementById("req-date").value = d.toISOString().split("T")[0];
+      openModal("requirement-modal");
+    }
+
+    async function handlePostRequirement(e) {
+      e.preventDefault();
+      const payload = {
+        crop_name: document.getElementById("req-crop-name").value.trim(),
+        category: document.getElementById("req-category").value,
+        quantity_kg: parseFloat(document.getElementById("req-quantity").value),
+        expected_price_per_kg: parseFloat(document.getElementById("req-expected-price").value),
+        required_date: document.getElementById("req-date").value,
+        requires_transport: document.getElementById("req-transport").value === "yes",
+        delivery_location: document.getElementById("req-location").value.trim(),
+        description: document.getElementById("req-desc").value.trim() || null
+      };
+
+      const btn = document.getElementById("btn-submit-req");
+      btn.disabled = true;
+      btn.textContent = "Publishing...";
+
+      try {
+        await apiRequest("/api/requirements/", {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+
+        showToast("Crop requirement posted successfully! Farmers will submit quotes.", "success");
+        closeModal("requirement-modal");
+        switchBuyerTab("reqs");
+      } catch (err) {
+        showToast(err.message, "error");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Publish Requirement →";
+      }
+    }
+
+    async function loadBuyerRequirements() {
+      const container = document.getElementById("buyer-reqs-container");
+      try {
+        const reqs = await apiRequest("/api/buyers/requirements");
+        if (!reqs || reqs.length === 0) {
+          container.innerHTML = `
+            <div style="text-align: center; padding: 3rem; background: #fff; border-radius: 8px; border: 1px dashed var(--border-light); color: var(--text-muted);">
+              You have not posted any crop requirements yet. Click "+ Post New Requirement" to request custom harvests!
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = `
+          <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            ${reqs.map(r => `
+              <div class="form-card" style="padding: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem;">
+                  <div>
+                    <h3 style="color: var(--primary-dark); font-size: 1.25rem;">${r.crop_name}</h3>
+                    <div style="font-size: 0.85rem; color: var(--text-muted);">
+                      Category: <strong>${r.category}</strong> &bull; Needed by: <strong>${r.required_date}</strong>
+                    </div>
+                  </div>
+                  <div>
+                    <span class="badge badge-status badge-Completed">${r.status}</span>
+                  </div>
+                </div>
+
+                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom: 1rem;">
+                  <div style="background: var(--primary-subtle); padding: 0.75rem; border-radius: 6px;">
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">Target Quantity:</div>
+                    <strong>${formatKg(r.quantity_kg)}</strong>
+                  </div>
+                  <div style="background: var(--primary-subtle); padding: 0.75rem; border-radius: 6px;">
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">Target Price:</div>
+                    <strong>${formatCurrency(r.expected_price_per_kg)}/kg</strong>
+                  </div>
+                  <div style="background: var(--primary-subtle); padding: 0.75rem; border-radius: 6px;">
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">Delivery Destination:</div>
+                    <strong>${r.delivery_location}</strong>
+                  </div>
+                  <div style="background: var(--primary-subtle); padding: 0.75rem; border-radius: 6px;">
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">Transport Option:</div>
+                    <strong>${r.requires_transport ? 'Yes, required' : 'Self-pickup'}</strong>
+                  </div>
+                </div>
+
+                ${r.description ? `<p style="font-size: 0.9rem; color: #4b5563; margin-bottom: 1rem;"><em>"${r.description}"</em></p>` : ''}
+
+                <!-- Farmer Quotation Responses -->
+                <div style="border-top: 1px solid var(--border-light); padding-top: 1rem;">
+                  <h4 style="font-size: 1rem; color: var(--primary-dark); margin-bottom: 0.75rem;">
+                    Farmer Quotes Received (${r.responses ? r.responses.length : 0})
+                  </h4>
+
+                  ${r.responses && r.responses.length > 0 ? `
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                      ${r.responses.map(resp => `
+                        <div style="background: #ffffff; border: 1px solid var(--border-green); border-radius: 6px; padding: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                          <div>
+                            <div style="font-weight: 700; color: var(--primary-dark); font-size: 1rem;">
+                              🧑‍🌾 ${resp.farmer_name}
+                              <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted); margin-left: 0.5rem;">📍 ${resp.farmer_location}</span>
+                            </div>
+                            <div style="font-size: 0.88rem; color: #374151; margin-top: 0.25rem;">
+                              Offered: <strong style="color: var(--primary);">${formatCurrency(resp.offered_price_per_kg)}/kg</strong> &bull; Available: <strong>${formatKg(resp.available_quantity_kg)}</strong>
+                            </div>
+                            <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem;">
+                              "${resp.message}"
+                            </div>
+                          </div>
+
+                          <div>
+                            <a href="tel:${resp.farmer_phone}" class="btn btn-outline btn-sm">
+                              📞 Call Farmer: ${resp.farmer_phone}
+                            </a>
+                          </div>
+                        </div>
+                      `).join("")}
+                    </div>
+                  ` : `
+                    <div style="font-size: 0.85rem; color: var(--text-muted); font-style: italic;">
+                      Waiting for farmer quotes. Local growers in your region are being notified.
+                    </div>
+                  `}
+                </div>
+              </div>
+            `).join("")}
+          </div>
+        `;
+      } catch (err) {
+        container.innerHTML = `<div style="color: var(--danger); text-align: center; padding: 2rem;">Error: ${err.message}</div>`;
+      }
+    }
+  </script>
+</body>
+</html>

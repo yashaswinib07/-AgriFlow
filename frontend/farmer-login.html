@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farmer Portal – AgriFlow</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧑‍🌾</text></svg>">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="brand-logo">
+        <svg viewBox="0 0 24 24">
+          <path d="M17,8C8,10 5.9,16.17 3.82,21.34L5.71,22L6.66,19.7C7.14,19.87 7.64,20 8,20C19,20 22,3 22,3C21,5 14,5.25 9,6.25C4,7.25 2,11.5 2,13.5C2,15.5 3.75,17.25 3.75,17.25C7,8 17,8 17,8Z"/>
+        </svg>
+        <span>AgriFlow</span>
+        <span class="brand-badge">Farmer Portal</span>
+      </a>
+
+      <div class="nav-auth-buttons">
+        <a href="index.html" class="btn btn-outline btn-sm">← Back to Home</a>
+        <a href="buyer-login.html" class="btn btn-sm" style="color: var(--text-muted);">Switch to Buyer Portal</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="max-width: 540px; margin: 3rem auto;">
+    <div class="form-card">
+      <div style="text-align: center; margin-bottom: 1.5rem;">
+        <span style="font-size: 2.5rem;">🧑‍🌾</span>
+        <h2 style="font-size: 1.75rem; font-weight: 800; color: var(--primary-dark); margin-top: 0.25rem;">
+          Farmer Account Portal
+        </h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">
+          Sell fresh crops directly to buyers without intermediaries.
+        </p>
+      </div>
+
+      <!-- Tab Switcher -->
+      <div class="tab-nav" style="justify-content: center; margin-bottom: 1.5rem;">
+        <button id="tab-login-btn" class="tab-btn active" onclick="switchTab('login')">Farmer Login</button>
+        <button id="tab-register-btn" class="tab-btn" onclick="switchTab('register')">Register as Farmer</button>
+      </div>
+
+      <!-- Quick Demo Login Banner -->
+      <div style="background: var(--primary-pale); border: 1px dashed var(--primary); padding: 0.75rem 1rem; border-radius: var(--radius-sm); margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem;">
+        <div>
+          <strong>Tester Tip:</strong> Use pre-seeded demo credentials
+        </div>
+        <button type="button" class="btn btn-primary btn-sm" onclick="fillDemoFarmer()">
+          Fill Demo Farmer
+        </button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="farmer-login-form" onsubmit="handleFarmerLogin(event)">
+        <div class="form-group">
+          <label class="form-label" for="login-email">Registered Email Address</label>
+          <input type="email" id="login-email" class="form-control" placeholder="e.g., ramesh@agriflow.com" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="login-password">Password</label>
+          <input type="password" id="login-password" class="form-control" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" id="btn-login-submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1rem;">
+          Login to Farmer Dashboard →
+        </button>
+      </form>
+
+      <!-- Registration Form -->
+      <form id="farmer-register-form" style="display: none;" onsubmit="handleFarmerRegister(event)">
+        <div class="form-group">
+          <label class="form-label" for="reg-name">Full Name</label>
+          <input type="text" id="reg-name" class="form-control" placeholder="e.g., Ramesh Patel" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reg-email">Email Address</label>
+          <input type="email" id="reg-email" class="form-control" placeholder="ramesh@example.com" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reg-phone">Phone Number</label>
+          <input type="tel" id="reg-phone" class="form-control" placeholder="+91 98765 43210" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reg-location">Village or Location</label>
+          <input type="text" id="reg-location" class="form-control" placeholder="e.g., Dindori Village, Nashik, Maharashtra" required>
+          <div class="form-helper">Enter your farm village, taluk, or district</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reg-password">Create Password</label>
+          <input type="password" id="reg-password" class="form-control" placeholder="At least 6 characters" minlength="6" required>
+        </div>
+
+        <button type="submit" id="btn-reg-submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1rem;">
+          Create Farmer Account →
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+  <script>
+    // Tab switching logic
+    function switchTab(tab) {
+      const loginBtn = document.getElementById("tab-login-btn");
+      const regBtn = document.getElementById("tab-register-btn");
+      const loginForm = document.getElementById("farmer-login-form");
+      const regForm = document.getElementById("farmer-register-form");
+
+      if (tab === "register") {
+        loginBtn.classList.remove("active");
+        regBtn.classList.add("active");
+        loginForm.style.display = "none";
+        regForm.style.display = "block";
+      } else {
+        regBtn.classList.remove("active");
+        loginBtn.classList.add("active");
+        regForm.style.display = "none";
+        loginForm.style.display = "block";
+      }
+    }
+
+    // Auto-select tab if URL parameter ?tab=register is present
+    document.addEventListener("DOMContentLoaded", () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get("tab") === "register") {
+        switchTab("register");
+      }
+
+      // If already logged in as farmer, redirect directly to dashboard
+      if (Auth.isLoggedIn() && Auth.isFarmer()) {
+        window.location.href = "farmer-dashboard.html";
+      }
+    });
+
+    // Demo fill helper
+    function fillDemoFarmer() {
+      switchTab("login");
+      document.getElementById("login-email").value = "ramesh@agriflow.com";
+      document.getElementById("login-password").value = "farmer123";
+      showToast("Demo farmer credentials filled! Click Login.", "info");
+    }
+
+    // Handle Login submission
+    async function handleFarmerLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById("login-email").value.trim();
+      const password = document.getElementById("login-password").value;
+      const submitBtn = document.getElementById("btn-login-submit");
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Logging in...";
+
+      try {
+        const res = await apiRequest("/api/farmers/login", {
+          method: "POST",
+          body: JSON.stringify({ email, password })
+        });
+
+        Auth.setSession(res.token, res.role, res.user);
+        showToast("Login successful! Redirecting...", "success");
+        setTimeout(() => {
+          window.location.href = "farmer-dashboard.html";
+        }, 600);
+      } catch (err) {
+        showToast(err.message, "error");
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Login to Farmer Dashboard →";
+      }
+    }
+
+    // Handle Registration submission
+    async function handleFarmerRegister(e) {
+      e.preventDefault();
+      const full_name = document.getElementById("reg-name").value.trim();
+      const email = document.getElementById("reg-email").value.trim();
+      const phone = document.getElementById("reg-phone").value.trim();
+      const location = document.getElementById("reg-location").value.trim();
+      const password = document.getElementById("reg-password").value;
+      const submitBtn = document.getElementById("btn-reg-submit");
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Registering...";
+
+      try {
+        const res = await apiRequest("/api/farmers/register", {
+          method: "POST",
+          body: JSON.stringify({ full_name, email, phone, location, password })
+        });
+
+        Auth.setSession(res.token, res.role, res.user);
+        showToast("Registration successful! Welcome to AgriFlow.", "success");
+        setTimeout(() => {
+          window.location.href = "farmer-dashboard.html";
+        }, 600);
+      } catch (err) {
+        showToast(err.message, "error");
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Create Farmer Account →";
+      }
+    }
+  </script>
+</body>
+</html>

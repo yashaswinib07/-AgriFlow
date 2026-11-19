@@ -1,0 +1,36 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+
+# Environment variables
+.env
+
+# Database file (ignored if user wants clean repo, but sample db auto-seeds on first launch)
+# backend/agriflow.db
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+
+# Node or temporary files
+node_modules/
+dist/
+build/
+# AgriFlow private database files
+backend/*.db
+backend/*.db-journal
+
+# Uploaded user files
+uploads/*
+!uploads/.gitkeep

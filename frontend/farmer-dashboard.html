@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farmer Dashboard – AgriFlow</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧑‍🌾</text></svg>">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="brand-logo">
+        <svg viewBox="0 0 24 24">
+          <path d="M17,8C8,10 5.9,16.17 3.82,21.34L5.71,22L6.66,19.7C7.14,19.87 7.64,20 8,20C19,20 22,3 22,3C21,5 14,5.25 9,6.25C4,7.25 2,11.5 2,13.5C2,15.5 3.75,17.25 3.75,17.25C7,8 17,8 17,8Z"/>
+        </svg>
+        <span>AgriFlow</span>
+        <span class="brand-badge">Farmer Dashboard</span>
+      </a>
+
+      <div class="nav-auth-buttons">
+        <a href="marketplace.html" class="btn btn-outline btn-sm">View Marketplace</a>
+        <button onclick="Auth.logout()" class="btn btn-danger btn-sm">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Header Bar with Farmer Info -->
+    <div class="dashboard-header">
+      <div class="dashboard-user-bar">
+        <div>
+          <h1 class="user-welcome-title">Welcome, <span id="farmer-name">Farmer</span>! 🌾</h1>
+          <p class="user-subtext">
+            <span>📍 Location: <strong id="farmer-location">Loading...</strong></span> &bull; 
+            <span>📞 Contact: <strong id="farmer-phone">Loading...</strong></span>
+          </p>
+        </div>
+        <div>
+          <button class="btn btn-primary" onclick="openAddCropModal()">
+            + Add New Crop Listing
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Stats Counters -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">📦</div>
+        <div>
+          <div class="stat-val" id="stat-total-crops">0</div>
+          <div class="stat-label">Active Listed Crops</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">⚖️</div>
+        <div>
+          <div class="stat-val" id="stat-total-quantity">0 kg</div>
+          <div class="stat-label">Total Stock Quantity</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon" style="background: var(--secondary-pale); color: var(--secondary-dark);">💰</div>
+        <div>
+          <div class="stat-val" id="stat-estimated-earnings" style="color: var(--secondary-dark);">₹0</div>
+          <div class="stat-label">Estimated Potential Earnings</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon" style="background: var(--warning-bg); color: var(--warning);">🔔</div>
+        <div>
+          <div class="stat-val" id="stat-pending-orders">0</div>
+          <div class="stat-label">Pending Orders</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="tab-nav">
+      <button id="tab-crops-btn" class="tab-btn active" onclick="switchDashboardTab('crops')">
+        My Listed Crops
+      </button>
+      <button id="tab-orders-btn" class="tab-btn" onclick="switchDashboardTab('orders')">
+        Incoming Buyer Orders
+      </button>
+      <button id="tab-reqs-btn" class="tab-btn" onclick="switchDashboardTab('reqs')">
+        Buyer Requirement Requests
+      </button>
+    </div>
+
+    <!-- TAB 1: Listed Crops -->
+    <div id="pane-crops" class="tab-pane active">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3 style="color: var(--primary-dark); font-weight: 700;">My Active Harvest Inventory</h3>
+        <button class="btn btn-primary btn-sm" onclick="openAddCropModal()">+ Add Crop</button>
+      </div>
+
+      <div id="crops-table-container">
+        <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+          Loading your crop listings...
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: Incoming Buyer Orders -->
+    <div id="pane-orders" class="tab-pane">
+      <div style="margin-bottom: 1rem;">
+        <h3 style="color: var(--primary-dark); font-weight: 700;">Customer Orders & Dispatch Management</h3>
+        <p style="font-size: 0.88rem; color: var(--text-muted);">
+          Review orders, accept or decline requests, and update shipment statuses.
+        </p>
+      </div>
+
+      <div id="orders-table-container">
+        <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+          Loading orders...
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: Buyer Requirement Requests -->
+    <div id="pane-reqs" class="tab-pane">
+      <div style="margin-bottom: 1rem;">
+        <h3 style="color: var(--primary-dark); font-weight: 700;">Buyer Crop Requirement Requests</h3>
+        <p style="font-size: 0.88rem; color: var(--text-muted);">
+          Buyers seeking crops not currently available. Respond with your offer to secure direct wholesale deals!
+        </p>
+      </div>
+
+      <div id="reqs-table-container">
+        <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+          Loading buyer requirements...
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ADD / EDIT CROP MODAL -->
+  <div id="crop-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="crop-modal-title" class="modal-title">Add New Crop Listing</h3>
+        <button class="modal-close" onclick="closeModal('crop-modal')">&times;</button>
+      </div>
+
+      <form id="crop-form" onsubmit="handleSaveCrop(event)">
+        <div class="modal-body">
+          <input type="hidden" id="edit-crop-id">
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="crop-name">Crop Name *</label>
+              <input type="text" id="crop-name" class="form-control" placeholder="e.g., Organic Red Tomato" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="crop-category">Crop Category *</label>
+              <select id="crop-category" class="form-control" required>
+                <option value="">Select Category</option>
+                <option value="Grains">Grains (Rice, Wheat, Maize, Ragi)</option>
+                <option value="Vegetables">Vegetables (Tomato, Potato, Onion, Carrot, Cabbage)</option>
+                <option value="Fruits">Fruits (Mango, Banana, Apple, Grapes, Orange)</option>
+                <option value="Pulses">Pulses (Chickpeas, Green Gram, Black Gram)</option>
+                <option value="Oilseeds">Oilseeds (Groundnut, Sunflower, Sesame)</option>
+                <option value="Spices">Spices (Chilli, Turmeric, Pepper)</option>
+                <option value="Other agricultural products">Other agricultural products</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Crop Type: Fresh / Surplus / Discounted -->
+          <div class="form-group" style="background: var(--primary-subtle); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-green);">
+            <label class="form-label">Crop Listing Type *</label>
+            <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+              <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+                <input type="radio" name="crop_type" value="fresh" checked onchange="toggleSurplusDiscount()">
+                <span>🌱 Fresh Regular Crop</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+                <input type="radio" name="crop_type" value="surplus" onchange="toggleSurplusDiscount()">
+                <span>⚡ Surplus Crop (Lower Price Deal)</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+                <input type="radio" name="crop_type" value="discounted" onchange="toggleSurplusDiscount()">
+                <span>🏷️ Discounted Clearance</span>
+              </label>
+            </div>
+            <div class="form-helper">
+              Marking as <strong>Surplus</strong> features your harvest on the dedicated Surplus deals section!
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="crop-quantity">Available Quantity (kg) *</label>
+              <input type="number" id="crop-quantity" class="form-control" placeholder="e.g., 500" min="1" step="0.5" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="crop-price">Original Price per kg (₹) *</label>
+              <input type="number" id="crop-price" class="form-control" placeholder="e.g., 30" min="1" step="0.5" required oninput="updateDiscountPreview()">
+            </div>
+          </div>
+
+          <!-- Surplus Discount Price Row (Shown when Surplus or Discounted is checked) -->
+          <div id="discount-price-group" class="form-group" style="display: none; background: #fff7ed; padding: 0.85rem; border-radius: var(--radius-sm); border: 1px solid #fed7aa;">
+            <label class="form-label" for="crop-discount-price" style="color: var(--secondary-dark);">
+              🏷️ Discounted Surplus Selling Price per kg (₹) *
+            </label>
+            <input type="number" id="crop-discount-price" class="form-control" placeholder="e.g., 20" min="0.5" step="0.5" oninput="updateDiscountPreview()">
+            <div id="discount-savings-calc" class="form-helper" style="color: var(--secondary-dark); font-weight: 600;">
+              Enter a lower price for surplus buyers.
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="crop-quality">Quality Grade *</label>
+              <select id="crop-quality" class="form-control" required>
+                <option value="Grade A">Grade A (Premium Quality)</option>
+                <option value="Grade B">Grade B (Standard Commercial)</option>
+                <option value="Organic">Certified Organic</option>
+                <option value="Export Quality">Export Quality</option>
+                <option value="Fair Average">Fair Average Quality (FAQ)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="crop-harvest-date">Harvest Date *</label>
+              <input type="date" id="crop-harvest-date" class="form-control" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="crop-location">Farm Village / Location *</label>
+            <input type="text" id="crop-location" class="form-control" placeholder="e.g., Dindori, Nashik, Maharashtra" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="crop-image">Crop Image URL</label>
+            <input type="url" id="crop-image" class="form-control" placeholder="https://example.com/crop.jpg (or leave blank for automatic category photo)">
+            <div class="form-helper">Optional: paste an image link or leave blank to use high quality agricultural photo.</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="crop-desc">Crop Description</label>
+            <textarea id="crop-desc" class="form-control" rows="3" placeholder="Describe variety, freshness, packaging, or special farm notes..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('crop-modal')">Cancel</button>
+          <button type="submit" id="btn-save-crop" class="btn btn-primary">Save & Publish Listing</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- FARMER RESPONSE MODAL (To respond to Buyer Requirement) -->
+  <div id="response-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">Submit Quotation to Buyer</h3>
+        <button class="modal-close" onclick="closeModal('response-modal')">&times;</button>
+      </div>
+
+      <form id="response-form" onsubmit="handleSendResponse(event)">
+        <div class="modal-body">
+          <input type="hidden" id="resp-req-id">
+
+          <div id="resp-req-summary" style="background: var(--primary-pale); padding: 1rem; border-radius: var(--radius-sm); margin-bottom: 1.25rem;">
+            <!-- Render requirement details dynamically -->
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="resp-price">Your Offered Price per kg (₹) *</label>
+              <input type="number" id="resp-price" class="form-control" min="0.5" step="0.5" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="resp-qty">Available Quantity (kg) *</label>
+              <input type="number" id="resp-qty" class="form-control" min="1" step="0.5" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="resp-message">Message / Delivery Notes</label>
+            <textarea id="resp-message" class="form-control" rows="3" placeholder="e.g., I have 1000 kg harvest ready for immediate loading. Excellent grade."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('response-modal')">Cancel</button>
+          <button type="submit" id="btn-send-resp" class="btn btn-primary">Submit Offer →</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    // Enforce Farmer Authentication
+    if (!Auth.isLoggedIn() || !Auth.isFarmer()) {
+      showToast("Please log in as a farmer to access this dashboard", "error");
+      setTimeout(() => { window.location.href = "farmer-login.html"; }, 500);
+    }
+
+    let currentFarmerCrops = [];
+
+    // Tab switcher
+    function switchDashboardTab(tab) {
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
+
+      document.getElementById(`tab-${tab}-btn`).classList.add("active");
+      document.getElementById(`pane-${tab}`).classList.add("active");
+
+      if (tab === "crops") loadFarmerCrops();
+      if (tab === "orders") loadFarmerOrders();
+      if (tab === "reqs") loadBuyerRequirements();
+    }
+
+    // Load initial data
+    document.addEventListener("DOMContentLoaded", () => {
+      const user = Auth.getUser();
+      if (user) {
+        document.getElementById("farmer-name").textContent = user.full_name;
+        document.getElementById("farmer-location").textContent = user.location;
+        document.getElementById("farmer-phone").textContent = user.phone;
+        document.getElementById("crop-location").value = user.location;
+      }
+      // Set today's date as default harvest date
+      document.getElementById("crop-harvest-date").value = new Date().toISOString().split("T")[0];
+
+      loadDashboardSummary();
+      loadFarmerCrops();
+    });
+
+    // 1. Dashboard summary counters
+    async function loadDashboardSummary() {
+      try {
+        const data = await apiRequest("/api/farmers/dashboard-summary");
+        document.getElementById("stat-total-crops").textContent = data.total_crops_count;
+        document.getElementById("stat-total-quantity").textContent = formatKg(data.total_quantity_kg);
+        document.getElementById("stat-estimated-earnings").textContent = formatCurrency(data.estimated_earnings);
+        document.getElementById("stat-pending-orders").textContent = data.pending_orders_count;
+      } catch (err) {
+        console.error("Failed to load summary:", err);
+      }
+    }
+
+    // 2. Load farmer's listed crops
+    async function loadFarmerCrops() {
+      const container = document.getElementById("crops-table-container");
+      try {
+        currentFarmerCrops = await apiRequest("/api/farmers/crops");
+        if (!currentFarmerCrops || currentFarmerCrops.length === 0) {
+          container.innerHTML = `
+            <div style="text-align: center; padding: 3rem; background: #fff; border-radius: 8px; border: 1px dashed var(--border-green);">
+              <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🌱</div>
+              <h4 style="color: var(--primary-dark);">No crops listed yet</h4>
+              <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">Start selling by listing your first fresh or surplus harvest.</p>
+              <button class="btn btn-primary" onclick="openAddCropModal()">+ Add New Crop</button>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = `
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Crop</th>
+                  <th>Category</th>
+                  <th>Stock Quantity</th>
+                  <th>Selling Price</th>
+                  <th>Quality</th>
+                  <th>Type</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${currentFarmerCrops.map(crop => {
+                  const isSurplus = crop.crop_type === "surplus" || crop.crop_type === "discounted";
+                  return `
+                    <tr>
+                      <td>
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                          <img src="${crop.image_url || 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=100'}" alt="" style="width: 44px; height: 44px; border-radius: 6px; object-fit: cover;">
+                          <div>
+                            <strong>${crop.name}</strong>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">Harvest: ${crop.harvest_date}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>${crop.category}</td>
+                      <td><strong>${formatKg(crop.quantity_kg)}</strong></td>
+                      <td>
+                        <strong>${formatCurrency(crop.effective_price)}/kg</strong>
+                        ${isSurplus && crop.discount_price_per_kg ? `<div style="font-size: 0.75rem; text-decoration: line-through; color: var(--text-muted);">${formatCurrency(crop.price_per_kg)}</div>` : ''}
+                      </td>
+                      <td>${crop.quality}</td>
+                      <td>
+                        <span class="badge ${isSurplus ? 'badge-surplus' : 'badge-fresh'}">
+                          ${crop.crop_type}
+                        </span>
+                      </td>
+                      <td>
+                        <span class="badge ${crop.is_active && crop.quantity_kg > 0 ? 'badge-fresh' : 'badge-status badge-Rejected'}">
+                          ${crop.is_active && crop.quantity_kg > 0 ? 'Active' : 'Out of Stock'}
+                        </span>
+                      </td>
+                      <td>
+                        <div style="display: flex; gap: 0.4rem;">
+                          <button class="btn btn-outline btn-sm" onclick="openEditCropModal(${crop.id})">Edit</button>
+                          <button class="btn btn-danger btn-sm" onclick="handleDeleteCrop(${crop.id}, '${crop.name}')">Delete</button>
+                        </div>
+                      </td>
+                    </tr>
+                  `;
+                }).join("")}
+              </tbody>
+            </table>
+          </div>
+        `;
+      } catch (err) {
+        container.innerHTML = `<div style="color: var(--danger); padding: 2rem; text-align: center;">Error loading crops: ${err.message}</div>`;
+      }
+    }
+
+    // 3. Load incoming buyer orders
+    async function loadFarmerOrders() {
+      const container = document.getElementById("orders-table-container");
+      try {
+        const orders = await apiRequest("/api/farmers/orders");
+        if (!orders || orders.length === 0) {
+          container.innerHTML = `
+            <div style="text-align: center; padding: 3rem; background: #fff; border-radius: 8px; border: 1px dashed var(--border-light); color: var(--text-muted);">
+              No incoming orders yet. Once buyers place orders, they will appear here.
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = `
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Order #</th>
+                  <th>Crop</th>
+                  <th>Buyer & Contact</th>
+                  <th>Quantity</th>
+                  <th>Transportation</th>
+                  <th>Total Amount</th>
+                  <th>Status</th>
+                  <th>Manage Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${orders.map(order => `
+                  <tr>
+                    <td><strong>#${order.id}</strong></td>
+                    <td>
+                      <strong>${order.crop_name}</strong>
+                      <div style="font-size: 0.78rem; color: var(--text-muted);">${formatCurrency(order.price_per_kg)}/kg</div>
+                    </td>
+                    <td>
+                      <div><strong>${order.buyer_name}</strong></div>
+                      <div style="font-size: 0.8rem; color: var(--text-muted);">📞 ${order.buyer_phone}</div>
+                      <div style="font-size: 0.75rem; color: #4b5563;">📍 ${order.delivery_location}</div>
+                    </td>
+                    <td><strong>${formatKg(order.quantity_kg)}</strong></td>
+                    <td>
+                      ${order.requires_transport ? `
+                        <div><strong>${order.vehicle_type}</strong> (${order.distance_km} km)</div>
+                        <div style="font-size: 0.8rem; color: var(--primary);">+${formatCurrency(order.transport_charge)} transport</div>
+                      ` : `
+                        <span style="color: var(--text-muted); font-size: 0.85rem;">Self-pickup (₹0)</span>
+                      `}
+                    </td>
+                    <td>
+                      <strong style="color: var(--primary-dark); font-size: 1.05rem;">${formatCurrency(order.final_amount)}</strong>
+                    </td>
+                    <td>
+                      <span class="badge badge-status badge-${order.status}">${order.status}</span>
+                    </td>
+                    <td>
+                      ${order.status === "Pending" ? `
+                        <div style="display: flex; gap: 0.4rem;">
+                          <button class="btn btn-primary btn-sm" onclick="updateOrderStatus(${order.id}, 'Accepted')">Accept</button>
+                          <button class="btn btn-danger btn-sm" onclick="updateOrderStatus(${order.id}, 'Rejected')">Reject</button>
+                        </div>
+                      ` : `
+                        <select class="form-control" style="padding: 0.3rem 0.5rem; font-size: 0.85rem;" onchange="updateOrderStatus(${order.id}, this.value)">
+                          <option value="Accepted" ${order.status === 'Accepted' ? 'selected' : ''}>Accepted</option>
+                          <option value="Dispatched" ${order.status === 'Dispatched' ? 'selected' : ''}>Dispatched</option>
+                          <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                          <option value="Completed" ${order.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                          <option value="Rejected" ${order.status === 'Rejected' ? 'selected' : ''}>Rejected</option>
+                        </select>
+                      `}
+                    </td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+          </div>
+        `;
+      } catch (err) {
+        container.innerHTML = `<div style="color: var(--danger); padding: 2rem; text-align: center;">Error loading orders: ${err.message}</div>`;
+      }
+    }
+
+    // 4. Update order status
+    async function updateOrderStatus(orderId, newStatus) {
+      try {
+        await apiRequest(`/api/orders/${orderId}/status`, {
+          method: "PUT",
+          body: JSON.stringify({ status: newStatus })
+        });
+        showToast(`Order #${orderId} marked as ${newStatus}`, "success");
+        loadFarmerOrders();
+        loadDashboardSummary();
+        loadFarmerCrops();
+      } catch (err) {
+        showToast(err.message, "error");
+      }
+    }
+
+    // 5. Load buyer requirements (Farmers can view and respond)
+    async function loadBuyerRequirements() {
+      const container = document.getElementById("reqs-table-container");
+      try {
+        const reqs = await apiRequest("/api/requirements/");
+        if (!reqs || reqs.length === 0) {
+          container.innerHTML = `
+            <div style="text-align: center; padding: 3rem; background: #fff; border-radius: 8px; border: 1px dashed var(--border-light); color: var(--text-muted);">
+              No open buyer requirements posted yet. Check back soon.
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = `
+          <div class="grid-cards" style="grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));">
+            ${reqs.map(r => `
+              <div class="form-card" style="padding: 1.25rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                  <div>
+                    <h4 style="color: var(--primary-dark); font-size: 1.15rem;">${r.crop_name}</h4>
+                    <span class="badge badge-fresh">${r.category}</span>
+                  </div>
+                  <span class="badge badge-status badge-${r.status}">${r.status}</span>
+                </div>
+
+                <div style="font-size: 0.88rem; color: #4b5563; margin: 0.75rem 0; display: flex; flex-direction: column; gap: 0.3rem;">
+                  <div><strong>Quantity Needed:</strong> ${formatKg(r.quantity_kg)}</div>
+                  <div><strong>Target Buying Price:</strong> ${formatCurrency(r.expected_price_per_kg)}/kg</div>
+                  <div><strong>Required Date:</strong> ${r.required_date}</div>
+                  <div><strong>Delivery City:</strong> ${r.delivery_location}</div>
+                  <div><strong>Buyer:</strong> ${r.buyer_name} (${r.buyer_phone})</div>
+                  ${r.description ? `<div style="background: var(--primary-subtle); padding: 0.5rem; border-radius: 4px; font-size: 0.82rem; margin-top: 0.35rem;">"${r.description}"</div>` : ''}
+                </div>
+
+                <div style="margin-top: 1rem; border-top: 1px dashed var(--border-light); padding-top: 0.75rem;">
+                  <button class="btn btn-secondary btn-block btn-sm" onclick="openResponseModal(${r.id}, '${r.crop_name}', ${r.quantity_kg}, ${r.expected_price_per_kg})">
+                    Respond to Requirement →
+                  </button>
+                </div>
+              </div>
+            `).join("")}
+          </div>
+        `;
+      } catch (err) {
+        container.innerHTML = `<div style="color: var(--danger); padding: 2rem; text-align: center;">Error: ${err.message}</div>`;
+      }
+    }
+
+    // Modal helpers for Add/Edit Crop
+    function openAddCropModal() {
+      document.getElementById("crop-modal-title").textContent = "Add New Crop Listing";
+      document.getElementById("edit-crop-id").value = "";
+      document.getElementById("crop-form").reset();
+      
+      const user = Auth.getUser();
+      if (user) document.getElementById("crop-location").value = user.location;
+      document.getElementById("crop-harvest-date").value = new Date().toISOString().split("T")[0];
+      
+      toggleSurplusDiscount();
+      openModal("crop-modal");
+    }
+
+    function openEditCropModal(cropId) {
+      const crop = currentFarmerCrops.find(c => c.id === cropId);
+      if (!crop) return;
+
+      document.getElementById("crop-modal-title").textContent = `Edit Crop: ${crop.name}`;
+      document.getElementById("edit-crop-id").value = crop.id;
+      document.getElementById("crop-name").value = crop.name;
+      document.getElementById("crop-category").value = crop.category;
+      document.getElementById("crop-quantity").value = crop.quantity_kg;
+      document.getElementById("crop-price").value = crop.price_per_kg;
+      document.getElementById("crop-discount-price").value = crop.discount_price_per_kg || "";
+      document.getElementById("crop-quality").value = crop.quality;
+      document.getElementById("crop-harvest-date").value = crop.harvest_date;
+      document.getElementById("crop-location").value = crop.location;
+      document.getElementById("crop-image").value = crop.image_url || "";
+      document.getElementById("crop-desc").value = crop.description || "";
+
+      const radio = document.querySelector(`input[name="crop_type"][value="${crop.crop_type}"]`);
+      if (radio) radio.checked = true;
+
+      toggleSurplusDiscount();
+      openModal("crop-modal");
+    }
+
+    function toggleSurplusDiscount() {
+      const selectedType = document.querySelector('input[name="crop_type"]:checked').value;
+      const discountGroup = document.getElementById("discount-price-group");
+      if (selectedType === "surplus" || selectedType === "discounted") {
+        discountGroup.style.display = "block";
+        updateDiscountPreview();
+      } else {
+        discountGroup.style.display = "none";
+      }
+    }
+
+    function updateDiscountPreview() {
+      const price = parseFloat(document.getElementById("crop-price").value) || 0;
+      const disc = parseFloat(document.getElementById("crop-discount-price").value) || 0;
+      const calcLabel = document.getElementById("discount-savings-calc");
+
+      if (price > 0 && disc > 0 && disc < price) {
+        const savingsPct = Math.round(((price - disc) / price) * 100);
+        calcLabel.innerHTML = `✓ Buyers will save <strong>${formatCurrency(price - disc)}/kg (${savingsPct}% OFF)</strong> on this surplus deal!`;
+      } else if (disc >= price && price > 0) {
+        calcLabel.innerHTML = `⚠️ Surplus discount price should be lower than original price (₹${price}/kg).`;
+      } else {
+        calcLabel.innerHTML = `Enter a lower selling price for surplus buyers.`;
+      }
+    }
+
+    // Save Crop (Create or Edit)
+    async function handleSaveCrop(e) {
+      e.preventDefault();
+      const cropId = document.getElementById("edit-crop-id").value;
+      const crop_type = document.querySelector('input[name="crop_type"]:checked').value;
+      const price_per_kg = parseFloat(document.getElementById("crop-price").value);
+      const discVal = document.getElementById("crop-discount-price").value;
+      const discount_price_per_kg = (crop_type === "surplus" || crop_type === "discounted") && discVal ? parseFloat(discVal) : null;
+
+      const payload = {
+        name: document.getElementById("crop-name").value.trim(),
+        category: document.getElementById("crop-category").value,
+        quantity_kg: parseFloat(document.getElementById("crop-quantity").value),
+        price_per_kg: price_per_kg,
+        discount_price_per_kg: discount_price_per_kg,
+        quality: document.getElementById("crop-quality").value,
+        crop_type: crop_type,
+        harvest_date: document.getElementById("crop-harvest-date").value,
+        location: document.getElementById("crop-location").value.trim(),
+        image_url: document.getElementById("crop-image").value.trim() || null,
+        description: document.getElementById("crop-desc").value.trim() || null
+      };
+
+      const btn = document.getElementById("btn-save-crop");
+      btn.disabled = true;
+      btn.textContent = "Saving...";
+
+      try {
+        if (cropId) {
+          await apiRequest(`/api/crops/${cropId}`, {
+            method: "PUT",
+            body: JSON.stringify(payload)
+          });
+          showToast("Crop details updated successfully!", "success");
+        } else {
+          await apiRequest("/api/crops/", {
+            method: "POST",
+            body: JSON.stringify(payload)
+          });
+          showToast("Crop listed successfully in marketplace!", "success");
+        }
+
+        closeModal("crop-modal");
+        loadFarmerCrops();
+        loadDashboardSummary();
+      } catch (err) {
+        showToast(err.message, "error");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Save & Publish Listing";
+      }
+    }
+
+    // Delete crop
+    async function handleDeleteCrop(cropId, cropName) {
+      if (!confirm(`Are you sure you want to delete crop listing '${cropName}'?`)) return;
+
+      try {
+        await apiRequest(`/api/crops/${cropId}`, { method: "DELETE" });
+        showToast(`Listing '${cropName}' deleted`, "success");
+        loadFarmerCrops();
+        loadDashboardSummary();
+      } catch (err) {
+        showToast(err.message, "error");
+      }
+    }
+
+    // Response Modal handlers
+    function openResponseModal(reqId, cropName, qty, expectedPrice) {
+      document.getElementById("resp-req-id").value = reqId;
+      document.getElementById("resp-price").value = expectedPrice;
+      document.getElementById("resp-qty").value = qty;
+      document.getElementById("resp-req-summary").innerHTML = `
+        <strong>Buyer Request:</strong> ${cropName} &bull; ${formatKg(qty)} &bull; Target: ${formatCurrency(expectedPrice)}/kg
+      `;
+      openModal("response-modal");
+    }
+
+    async function handleSendResponse(e) {
+      e.preventDefault();
+      const reqId = parseInt(document.getElementById("resp-req-id").value);
+      const offered_price_per_kg = parseFloat(document.getElementById("resp-price").value);
+      const available_quantity_kg = parseFloat(document.getElementById("resp-qty").value);
+      const message = document.getElementById("resp-message").value.trim();
+
+      const btn = document.getElementById("btn-send-resp");
+      btn.disabled = true;
+      btn.textContent = "Submitting...";
+
+      try {
+        await apiRequest("/api/requirements/respond", {
+          method: "POST",
+          body: JSON.stringify({
+            requirement_id: reqId,
+            offered_price_per_kg,
+            available_quantity_kg,
+            message
+          })
+        });
+        showToast("Quotation offer sent directly to buyer!", "success");
+        closeModal("response-modal");
+      } catch (err) {
+        showToast(err.message, "error");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Submit Offer →";
+      }
+    }
+  </script>
+</body>
+</html>

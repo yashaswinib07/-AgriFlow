@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgriFlow – Farmer and Buyer Agricultural Marketplace</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="brand-logo">
+        <svg viewBox="0 0 24 24">
+          <path d="M17,8C8,10 5.9,16.17 3.82,21.34L5.71,22L6.66,19.7C7.14,19.87 7.64,20 8,20C19,20 22,3 22,3C21,5 14,5.25 9,6.25C4,7.25 2,11.5 2,13.5C2,15.5 3.75,17.25 3.75,17.25C7,8 17,8 17,8Z"/>
+        </svg>
+        <span>AgriFlow</span>
+        <span class="brand-badge">Marketplace</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="index.html" class="active">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="marketplace.html">Marketplace</a></li>
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+
+      <div class="nav-auth-buttons" id="nav-auth">
+        <a href="farmer-login.html" class="btn btn-outline btn-sm">Farmer Login</a>
+        <a href="buyer-login.html" class="btn btn-primary btn-sm">Buyer Login</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-grid">
+      <div>
+        <div class="badge badge-fresh" style="margin-bottom: 1rem;">Direct Farm-to-Buyer Platform</div>
+        <h1 class="hero-title">
+          Connecting <span>Farmers & Buyers</span> Directly at Fair Prices
+        </h1>
+        <p class="hero-desc">
+          AgriFlow empowers farmers to sell fresh and seasonal surplus harvests directly to wholesale and retail buyers. No middlemen, transparent pricing, and built-in transportation.
+        </p>
+
+        <div class="hero-cta-box">
+          <a href="marketplace.html" class="btn btn-primary btn-lg">Explore Marketplace</a>
+          <a href="farmer-login.html?tab=register" class="btn btn-outline btn-lg">Register as Farmer</a>
+          <a href="buyer-login.html?tab=register" class="btn btn-secondary btn-lg">Register as Buyer</a>
+        </div>
+
+        <div style="display: flex; gap: 2rem; color: #4b5563; font-size: 0.92rem; font-weight: 600;">
+          <div>✓ Zero Middlemen Cut</div>
+          <div>✓ Surplus Discount Deals</div>
+          <div>✓ Integrated Transport</div>
+        </div>
+      </div>
+
+      <div class="hero-card">
+        <img src="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=700&auto=format&fit=crop&q=80" alt="Lush Green Farm Fields">
+        <h3 style="color: var(--primary-dark); font-size: 1.25rem; font-weight: 700;">Empowering Rural Agriculture</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.4rem;">
+          Transparent wholesale trading, guaranteed stock visibility, and instant logistics calculation.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Surplus Banner -->
+  <main class="container">
+    <section class="surplus-section">
+      <div class="surplus-header">
+        <div>
+          <h2 class="surplus-title">
+            <span>⚡</span> SURPLUS CROPS – BUY AT LOWER PRICES
+          </h2>
+          <p class="surplus-subtitle">
+            Seasonal surplus harvests discounted directly by farmers. Help avoid farm waste and save up to 40%!
+          </p>
+        </div>
+        <a href="marketplace.html?filter=surplus" class="btn btn-secondary">
+          View All Surplus Crops →
+        </a>
+      </div>
+
+      <!-- Preview container for surplus crops loaded dynamically -->
+      <div id="home-surplus-grid" class="grid-cards">
+        <div style="text-align: center; padding: 2rem; color: var(--text-muted); grid-column: 1 / -1;">
+          Loading surplus deals...
+        </div>
+      </div>
+    </section>
+
+    <!-- How AgriFlow Works (About Section) -->
+    <section id="about" style="padding: 3rem 0;">
+      <div style="text-align: center; max-width: 700px; margin: 0 auto 3rem;">
+        <span class="badge badge-fresh">Simple & Transparent</span>
+        <h2 style="font-size: 2.2rem; font-weight: 800; color: var(--primary-dark); margin-top: 0.5rem;">
+          How AgriFlow Helps Farmers and Buyers
+        </h2>
+        <p style="color: var(--text-muted); margin-top: 0.5rem;">
+          Traditional supply chains eat up to 50% of the produce value in commissions. AgriFlow brings true farm-to-table transparency.
+        </p>
+      </div>
+
+      <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+        <div class="stat-card" style="flex-direction: column; text-align: center; padding: 2rem;">
+          <div class="stat-icon" style="margin: 0 auto 1rem; width: 64px; height: 64px; font-size: 2rem;">🚜</div>
+          <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 0.5rem;">For Farmers</h3>
+          <p style="font-size: 0.92rem; color: #4b5563;">
+            List fresh crops and surplus harvest at custom prices. Manage incoming orders, review buyer custom requests, and receive direct fair payments without commission losses.
+          </p>
+          <div style="margin-top: 1.25rem;">
+            <a href="farmer-login.html" class="btn btn-outline btn-sm">Farmer Portal →</a>
+          </div>
+        </div>
+
+        <div class="stat-card" style="flex-direction: column; text-align: center; padding: 2rem;">
+          <div class="stat-icon" style="margin: 0 auto 1rem; width: 64px; height: 64px; font-size: 2rem; background: var(--secondary-pale); color: var(--secondary-dark);">🏪</div>
+          <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--secondary-dark); margin-bottom: 0.5rem;">For Buyers</h3>
+          <p style="font-size: 0.92rem; color: #4b5563;">
+            Procure directly from vetted farmers. Compare prices across grains, vegetables, and fruits. Post custom crop requirements when items aren't listed yet.
+          </p>
+          <div style="margin-top: 1.25rem;">
+            <a href="buyer-login.html" class="btn btn-secondary btn-sm">Buyer Portal →</a>
+          </div>
+        </div>
+
+        <div class="stat-card" style="flex-direction: column; text-align: center; padding: 2rem;">
+          <div class="stat-icon" style="margin: 0 auto 1rem; width: 64px; height: 64px; font-size: 2rem; background: var(--info-bg); color: var(--info);">🚚</div>
+          <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--info); margin-bottom: 0.5rem;">Fair Logistics</h3>
+          <p style="font-size: 0.92rem; color: #4b5563;">
+            Full control over transport. Arrange your own pickup with zero freight charges, or select from Tractors, Mini Trucks, and Heavy Freight with clear upfront distance estimates.
+          </p>
+          <div style="margin-top: 1.25rem;">
+            <a href="marketplace.html" class="btn btn-primary btn-sm">Browse Crops →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Crop Categories Showcase -->
+    <section id="how-it-works" style="padding: 2.5rem 0; border-top: 1px solid var(--border-light);">
+      <div style="text-align: center; margin-bottom: 2.5rem;">
+        <span class="badge badge-fresh">Diverse Catalog</span>
+        <h2 style="font-size: 2rem; font-weight: 800; color: var(--primary-dark); margin-top: 0.5rem;">
+          Explore Agricultural Categories
+        </h2>
+        <p style="color: var(--text-muted);">From staple grains and organic vegetables to oilseeds and exotic spices.</p>
+      </div>
+
+      <div class="grid-cards" style="grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));">
+        <a href="marketplace.html?category=Grains" style="text-decoration: none; color: inherit;">
+          <div class="stat-card" style="flex-direction: column; text-align: center; padding: 1.25rem; cursor: pointer; transition: transform 0.2s;">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🌾</div>
+            <h4 style="font-weight: 700;">Grains</h4>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">Rice, Wheat, Maize, Ragi</span>
+          </div>
+        </a>
+
+        <a href="marketplace.html?category=Vegetables" style="text-decoration: none; color: inherit;">
+          <div class="stat-card" style="flex-direction: column; text-align: center; padding: 1.25rem; cursor: pointer;">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🍅</div>
+            <h4 style="font-weight: 700;">Vegetables</h4>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">Tomato, Potato, Onion</span>
+          </div>
+        </a>
+
+        <a href="marketplace.html?category=Fruits" style="text-decoration: none; color: inherit;">
+          <div class="stat-card" style="flex-direction: column; text-align: center; padding: 1.25rem; cursor: pointer;">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🥭</div>
+            <h4 style="font-weight: 700;">Fruits</h4>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">Mango, Banana, Apple</span>
+          </div>
+        </a>
+
+        <a href="marketplace.html?category=Pulses" style="text-decoration: none; color: inherit;">
+          <div class="stat-card" style="flex-direction: column; text-align: center; padding: 1.25rem; cursor: pointer;">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🥣</div>
+            <h4 style="font-weight: 700;">Pulses</h4>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">Chickpeas, Green Gram</span>
+          </div>
+        </a>
+
+        <a href="marketplace.html?category=Oilseeds" style="text-decoration: none; color: inherit;">
+          <div class="stat-card" style="flex-direction: column; text-align: center; padding: 1.25rem; cursor: pointer;">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🌻</div>
+            <h4 style="font-weight: 700;">Oilseeds</h4>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">Groundnut, Sunflower</span>
+          </div>
+        </a>
+
+        <a href="marketplace.html?category=Spices" style="text-decoration: none; color: inherit;">
+          <div class="stat-card" style="flex-direction: column; text-align: center; padding: 1.25rem; cursor: pointer;">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🌶️</div>
+            <h4 style="font-weight: 700;">Spices</h4>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">Chilli, Turmeric, Pepper</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- Contact & Assistance Section -->
+    <section id="contact" style="margin: 3.5rem 0; padding: 2.5rem; background: #ffffff; border-radius: var(--radius-lg); border: 1px solid var(--border-green);">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; align-items: center;">
+        <div>
+          <span class="badge badge-fresh">Help & Support</span>
+          <h2 style="font-size: 1.85rem; font-weight: 800; color: var(--primary-dark); margin: 0.5rem 0 1rem;">
+            Have Questions or Need Assistance?
+          </h2>
+          <p style="color: #4b5563; font-size: 0.95rem; margin-bottom: 1.5rem;">
+            Whether you are a smallholder farmer looking to list your first harvest or a wholesale buyer requiring bulk deliveries, the AgriFlow team is here to assist.
+          </p>
+          <div style="font-size: 0.95rem; color: #374151; display: flex; flex-direction: column; gap: 0.5rem;">
+            <div>📞 <strong>Toll-Free Kisan Helpline:</strong> 1800-AGRI-FLOW</div>
+            <div>✉️ <strong>Support Email:</strong> support@agriflow.local</div>
+            <div>📍 <strong>Central Operations:</strong> Agricultural Produce Market Center (APMC) Hub</div>
+          </div>
+        </div>
+        <div style="background: var(--primary-subtle); padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border-green);">
+          <h4 style="color: var(--primary-dark); margin-bottom: 0.75rem;">Quick Contact Message</h4>
+          <form onsubmit="event.preventDefault(); showToast('Thank you! Your message has been received.', 'success'); this.reset();">
+            <div class="form-group">
+              <input type="text" class="form-control" placeholder="Your Name" required>
+            </div>
+            <div class="form-group">
+              <input type="email" class="form-control" placeholder="Your Email Address" required>
+            </div>
+            <div class="form-group">
+              <textarea class="form-control" rows="3" placeholder="How can we help you?" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Send Message</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>AgriFlow Marketplace</h4>
+        <p style="font-size: 0.9rem; color: #cbd5e1; line-height: 1.6;">
+          Connecting farmers directly with buyers across India for fair crop prices, transparent surplus selling, and estimated transportation.
+        </p>
+      </div>
+      <div class="footer-col">
+        <h4>Farmer Portals</h4>
+        <ul>
+          <li><a href="farmer-login.html">Farmer Login</a></li>
+          <li><a href="farmer-login.html?tab=register">Register as Farmer</a></li>
+          <li><a href="farmer-dashboard.html">Farmer Dashboard</a></li>
+          <li><a href="marketplace.html?filter=surplus">List Surplus Produce</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Buyer Portals</h4>
+        <ul>
+          <li><a href="buyer-login.html">Buyer Login</a></li>
+          <li><a href="buyer-login.html?tab=register">Register as Buyer</a></li>
+          <li><a href="buyer-dashboard.html">Buyer Dashboard</a></li>
+          <li><a href="marketplace.html">Browse Marketplace</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Technical Documentation</h4>
+        <ul>
+          <li><a href="/docs" target="_blank">Interactive Swagger API</a></li>
+          <li><a href="/redoc" target="_blank">ReDoc API Specifications</a></li>
+          <li><a href="https://fastapi.tiangolo.com" target="_blank">Powered by FastAPI</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; 2026 AgriFlow Agricultural Marketplace. Built with FastAPI, SQLite, and Modern Web Standards.
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    // Load surplus crops preview on home page
+    document.addEventListener("DOMContentLoaded", async () => {
+      const surplusContainer = document.getElementById("home-surplus-grid");
+      try {
+        const crops = await apiRequest("/api/crops/surplus");
+        if (!crops || crops.length === 0) {
+          surplusContainer.innerHTML = `<div style="text-align: center; grid-column: 1 / -1; color: var(--text-muted); padding: 1.5rem;">No surplus crops listed right now. Check back soon!</div>`;
+          return;
+        }
+
+        // Show up to 4 crops
+        const previewList = crops.slice(0, 4);
+        surplusContainer.innerHTML = previewList.map(crop => {
+          const discountPct = Math.round(((crop.price_per_kg - crop.effective_price) / crop.price_per_kg) * 100);
+          return `
+            <div class="crop-card">
+              <div class="crop-card-img-wrap">
+                <img src="${crop.image_url || 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=600'}" alt="${crop.name}" loading="lazy">
+                <div class="crop-card-badge">
+                  <span class="badge badge-surplus">Surplus -${discountPct}%</span>
+                </div>
+                <div class="crop-card-cat">${crop.category}</div>
+              </div>
+              <div class="crop-card-body">
+                <h3 class="crop-card-title">${crop.name}</h3>
+                <div class="crop-card-farmer">
+                  <span>🧑‍🌾 ${crop.farmer_name}</span> &bull; <span>📍 ${crop.location}</span>
+                </div>
+                <div class="crop-card-info-row">
+                  <span>Available Stock:</span>
+                  <strong>${formatKg(crop.quantity_kg)}</strong>
+                </div>
+                <div class="crop-card-info-row">
+                  <span>Quality Grade:</span>
+                  <span>${crop.quality}</span>
+                </div>
+                <div class="crop-price-box">
+                  <div>
+                    <span class="price-main">${formatCurrency(crop.effective_price)}</span>
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">/kg</span>
+                    <span class="price-original">${formatCurrency(crop.price_per_kg)}</span>
+                  </div>
+                  <span class="price-savings">Save ${discountPct}%</span>
+                </div>
+                <a href="marketplace.html?crop=${crop.id}" class="btn btn-secondary btn-block">
+                  Buy Surplus Deal
+                </a>
+              </div>
+            </div>
+          `;
+        }).join("");
+      } catch (err) {
+        surplusContainer.innerHTML = `<div style="text-align: center; grid-column: 1 / -1; color: var(--danger); padding: 1.5rem;">Could not load surplus crops. Ensure FastAPI server is running.</div>`;
+      }
+    });
+  </script>
+</body>
+</html>
